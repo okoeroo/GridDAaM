@@ -1,19 +1,18 @@
-bin_PROGRAMS = cdmifs
+bin_PROGRAMS = griddaamfs
 
-AM_CFLAGS = -Wall -Wextra -D_GNU_SOURCE $(FUSE_CFLAGS) $(JANSSON_CFLAGS) @LIBCURL_CPPFLAGS@
+AM_CFLAGS = \
+            -g -W -Wall -ansi -pedantic -Wbad-function-cast -Wcast-align \
+            -Wcast-qual -Wchar-subscripts -Winline \
+            -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
+            -Wredundant-decls -Wshadow -Wstrict-prototypes \
+            -Wpointer-arith -Wno-long-long \
+            -Wcomment -Wmissing-include-dirs \
+            -O2 -Wuninitialized \
+            $(FUSE_CFLAGS) $(JANSSON_CFLAGS)
 
-cdmifs_SOURCES = \
-		cdmifs.c \
-		util.c \
-		net.c \
-		cdmi.c \
-		fs/attr.c \
-		fs/control.c \
-		fs/directory.c \
-		fs/read.c \
-		fs/write.c \
-		b64/cdecode.c \
-		b64/cencode.c
-cdmifs_LDFLAGS = @LIBCURL@
-cdmifs_LDADD = $(FUSE_LIBS) $(JANSSON_LIBS) $(MAGIC_LIBS)
+
+griddaamfs_SOURCES = \
+		fuse-driver/helloworld.c
+griddaamfs_LDFLAGS = 
+griddaamfs_LDADD = $(FUSE_LIBS) $(JANSSON_LIBS)
 
