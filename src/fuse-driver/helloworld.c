@@ -7,6 +7,9 @@
 */
 
 #include <fuse.h>
+#include <fuse/fuse.h>
+#include <fuse_opt.h>
+#include <fuse/fuse_opt.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -14,6 +17,8 @@
 
 static const char *hello_str = "Hello World!\n";
 static const char *hello_path = "/hello";
+
+
 
 static int hello_getattr(const char *path, struct stat *stbuf)
 {
@@ -81,15 +86,17 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
     return size;
 }
 
-static struct fuse_operations hello_oper = {
+/* const struct fuse_operations  *      op */
+static const struct fuse_operations hello_oper = {
     .getattr    = hello_getattr,
     .readdir    = hello_readdir,
-    .open   = hello_open,
-    .read   = hello_read,
+    .open       = hello_open,
+    .read       = hello_read
 };
 
 int main(int argc, char *argv[])
 {
-    return fuse_main(argc, argv, &hello_oper);
+    /* return fuse_main(argc, argv, &hello_oper); */
+    return fuse_main(argc, argv, &hello_oper, NULL);
 }
 
