@@ -16,7 +16,7 @@
 #include <fcntl.h>
 
 static const char *hello_str = "Hello World!\n";
-static const char *hello_path = "/hello";
+static const char *grid_path = "/grid";
 
 
 
