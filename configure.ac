@@ -24,6 +24,9 @@ AC_SUBST(JANSSON_CFLAGS)
 AC_SUBST(JANSSON_LIBS)
 
 # LIBCURL_CHECK_CONFIG( [yes], [7.19.0], [], AC_MSG_ERROR([libcurl not found]) )
+#LIBCURL_CHECK_CONFIG([yes], [7.15.1], [], AC_MSG_ERROR(["libcurl not found"]))
+
+AC_CHECK_LIB( [curl], [curl_easy_init],,[AC_MSG_ERROR([Missing libcurl (libcurl)])])
 
 # AC_CHECK_LIB( [magic], [magic_open],,[AC_MSG_ERROR([Missing libmagic (libmagic-dev)])])
 

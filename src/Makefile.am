@@ -9,11 +9,11 @@ AM_CFLAGS = \
             -Wcomment -Wmissing-include-dirs \
             -O2 -Wuninitialized \
             -D__FreeBSD__=10 -D__DARWIN_64_BIT_INO_T=1 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=27 \
-            $(FUSE_CFLAGS) $(JANSSON_CFLAGS)
+            $(CURL_CFLAGS) $(FUSE_CFLAGS) $(JANSSON_CFLAGS)
 
 
 griddaamfs_SOURCES = \
 		fuse-driver/helloworld.c
 griddaamfs_LDFLAGS = 
-griddaamfs_LDADD = $(FUSE_LIBS) $(JANSSON_LIBS)
+griddaamfs_LDADD = $(CURL_LIBS) $(FUSE_LIBS) $(JANSSON_LIBS)
 
