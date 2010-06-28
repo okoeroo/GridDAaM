@@ -44,7 +44,13 @@ static int grid_getattr(const char *path, struct stat *stbuf)
         stbuf->st_gid = getgid();
     }
     else
-        res = -ENOENT;
+    {
+        stbuf->st_mode = S_IFREG | 0444;
+        stbuf->st_nlink = 1;
+        stbuf->st_uid = getuid();
+        stbuf->st_gid = getgid();
+    }
+        /* res = -ENOENT; */
 
     return res;
 }
@@ -52,66 +58,23 @@ static int grid_getattr(const char *path, struct stat *stbuf)
 static int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi)
 {
-    (void) offset;
-    (void) fi;
-
-    if(strcmp(path, "/") != 0)
-        return -ENOENT;
-
-    filler(buf, ".", NULL, 0);
-    filler(buf, "..", NULL, 0);
-    filler(buf, grid_path + 1, NULL, 0);
-
-    return 0;
-}
-
-static int grid_open(const char *path, struct fuse_file_info *fi)
-{
-    if(strcmp(path, grid_path) != 0)
-        return -ENOENT;
-
-    if((fi->flags & 3) != O_RDONLY)
-        return -EACCES;
-
-    return 0;
-}
-
-static int grid_read(const char *path, char *buf, size_t size, off_t offset,
-                      struct fuse_file_info *fi)
-{
-    size_t len;
-    (void) fi;
-    if(strcmp(path, grid_path) != 0)
-        return -ENOENT;
-
-    len = strlen(grid_str);
-    if (offset < len) {
-        if (offset + size > len)
-            size = len - offset;
-        memcpy(buf, grid_str + offset, size);
-    } else
-        size = 0;
-
-    return size;
-}
-
-/* const struct fuse_operations  *      op */
-static const struct fuse_operations grid_oper = {
-    .getattr    = grid_getattr,
-    .readdir    = grid_readdir,
-    .open       = grid_open,
-    .read       = grid_read
-};
-
-
-int main(int argc, char *argv[])
-{
     struct MemoryStruct * mem = NULL;
     json_t * root = NULL;
     json_error_t json_error;
     json_t * commits = NULL;
     int i = 0;
     
+    (void) offset;
+    (void) fi;
+
+
+    if(strcmp(path, "/") != 0)
+        return -ENOENT;
+
+    filler(buf, ".", NULL, 0);
+    filler(buf, "..", NULL, 0);
+    /* filler(buf, grid_path + 1, NULL, 0); */
+
     mem = download ((char *) url);
     printf ("bar!\n%s\n", mem -> memory);
 
@@ -168,6 +131,7 @@ int main(int argc, char *argv[])
                     }
                     myname = json_string_value(file);
                     printf ("%s\n", myname);
+                    filler(buf, myname, NULL, 0);
                 }
 
             }
@@ -180,54 +144,53 @@ int main(int argc, char *argv[])
             iter = json_object_iter_next(root, iter);
         }
     }
-
-
-    /*
-    commits = json_object_get(root, "root");
-
-    if(!json_is_array(commits))
-    {
-            fprintf(stderr, "error: commits is not an array\n");
-                return 1;
-    }
-*/
-    commits = json_array_get(root, i);
-    for(i = 0; i < json_array_size(commits); i++)
-    {
-        json_t *commit, *id, *message;
-        const char *message_text;
-
-        printf ("element %i\n", i);
-
-        commit = json_array_get(commits, i);
-        if(!json_is_object(commit))
-        {
-            fprintf(stderr, "error: commit %d is not an object\n", i + 1);
-            return 1;
-        }
-        id = json_object_get(commit, "dir");
-        if(!json_is_string(id))
-        {
-            fprintf(stderr, "error: commit %d: id is not a string\n", i + 1);
-            return 1;
-        }
-
-        message = json_object_get(commit, "message");
-        if(!json_is_string(message))
-        {
-            fprintf(stderr, "error: commit %d: message is not a string\n", i + 1);
-            return 1;
-        }
-        message_text = json_string_value(message);
-        printf("%.8s %.5s\n",
-                json_string_value(id),
-                message_text);
-        /* printf("%.8s %.*s\n", */
-                /* json_string_value(id), */
-                /* newline_offset(message_text), */
-                /* message_text); */
-    }
+    /* Ref-counter lowering */
     json_decref(root);
+
+    return 0;
+}
+
+static int grid_open(const char *path, struct fuse_file_info *fi)
+{
+    if(strcmp(path, grid_path) != 0)
+        return -ENOENT;
+
+    if((fi->flags & 3) != O_RDONLY)
+        return -EACCES;
+
+    return 0;
+}
+
+static int grid_read(const char *path, char *buf, size_t size, off_t offset,
+                      struct fuse_file_info *fi)
+{
+    size_t len;
+    (void) fi;
+    if(strcmp(path, grid_path) != 0)
+        return -ENOENT;
+
+    len = strlen(grid_str);
+    if (offset < len) {
+        if (offset + size > len)
+            size = len - offset;
+        memcpy(buf, grid_str + offset, size);
+    } else
+        size = 0;
+
+    return size;
+}
+
+/* const struct fuse_operations  *      op */
+static const struct fuse_operations grid_oper = {
+    .getattr    = grid_getattr,
+    .readdir    = grid_readdir,
+    .open       = grid_open,
+    .read       = grid_read
+};
+
+
+int main(int argc, char *argv[])
+{
 
 
     /* return fuse_main(argc, argv, &grid_oper); */
