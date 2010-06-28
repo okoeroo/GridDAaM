@@ -18,7 +18,9 @@ AM_CFLAGS = \
 
 
 griddaamfs_SOURCES = \
+        common/common.c \
 		proto/curl-getinmemory.c \
+		fuse-driver/griddaam_getattr.c \
 		fuse-driver/griddaam_main.c
 griddaamfs_LDFLAGS = 
 griddaamfs_LDADD = -lcurl $(FUSE_LIBS) $(JANSSON_LIBS)
