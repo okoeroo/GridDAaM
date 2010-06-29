@@ -20,6 +20,7 @@ AM_CFLAGS = \
 griddaamfs_SOURCES = \
         common/common.c \
 		proto/curl-getinmemory.c \
+        fuse-driver/griddaam_readdir.c \
 		fuse-driver/griddaam_getattr.c \
 		fuse-driver/griddaam_main.c
 griddaamfs_LDFLAGS = 
