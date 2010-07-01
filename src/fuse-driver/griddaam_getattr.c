@@ -24,15 +24,19 @@ struct stat * GDDI_getattr (const char * path)
     json_t * root = NULL;
     json_error_t json_error;
     json_t * commits = NULL;
+    json_t *value = NULL;
+    void *iter = NULL;
+    void *iter2 = NULL;
     int i = 0;
     char * myurl = NULL;
 
     char * searchpath = NULL;
+    char * path_base = NULL;
     char * dir_entry_name = NULL;
     
     searchpath = dirname(path);
     /* searchpath = path; */
-    dir_entry_name = basename(path);
+    path_base = basename(path);
 
     mystat = malloc (sizeof (struct stat));
     if (!mystat)
@@ -42,7 +46,7 @@ struct stat * GDDI_getattr (const char * path)
     }
 
     
-    printf ("%s ------------------- Fetching: %s%s on entry %s\n", __func__, getGridFSURL(), searchpath, dir_entry_name);
+    printf ("%s ------------------- Fetching: %s%s on entry %s\n", __func__, getGridFSURL(), searchpath, path_base);
     /* Query root */
     if ((strlen(searchpath) == 1) && (searchpath[0] == '/'))
     {    
@@ -52,8 +56,7 @@ struct stat * GDDI_getattr (const char * path)
     {
         mem = download (getGridFSURL(), searchpath, 1);
     }
-    printf ("%s ------------------- Fetched:  %s%s on entry %s  path = %s\n", __func__, getGridFSURL(), searchpath, dir_entry_name, path);
-    printf ("%s\n", path);
+    printf ("%s ------------------- Fetched:  %s%s on entry %s  path = %s\n", __func__, getGridFSURL(), searchpath, path_base, path);
     
     /* Check on Django error */
     if (strstr(mem -> data, "NameError at"))
@@ -82,61 +85,59 @@ struct stat * GDDI_getattr (const char * path)
     else
     {
         /* obj is a JSON object */
-        char * dir_entry_name = NULL;
-        json_t *value;
-        void *iter = json_object_iter(root);
+        iter = json_object_iter(root);
         while(iter)
         {
             dir_entry_name = json_object_iter_key(iter);
             value = json_object_iter_value(iter);
 
             printf ("Key is: %s\n", dir_entry_name);
-           
-            if (json_is_object (value))
+            if (strcmp(dir_entry_name, path_base) == 0)
             {
-                void *iter2;
-
-                iter2 = json_object_iter(value);
-                while (iter2)
+                if (json_is_object (value))
                 {
-                    const char *key2;
-                    json_t *value2;
-                    char * myname = NULL;
-
-                    key2 = json_object_iter_key(iter2);
-                    value2 = json_object_iter_value(iter2);
-
-                    printf ("Key2 is: %s\n", key2);
-                    if (strcmp(key2, "type") == 0)
+                    iter2 = json_object_iter(value);
+                    while (iter2)
                     {
-                        if(json_is_string(value2))
+                        const char *key2;
+                        json_t *value2;
+                        char * myname = NULL;
+
+                        key2 = json_object_iter_key(iter2);
+                        value2 = json_object_iter_value(iter2);
+
+                        printf ("Key2 is: %s\n", key2);
+                        if (strcmp(key2, "type") == 0)
                         {
-                            myname = json_string_value(value2);
-
-                            if (strcmp (myname, "dir") == 0)
+                            if(json_is_string(value2))
                             {
-                                mystat->st_mode = S_IFDIR | 0755;
-                                mystat->st_nlink = 2;
+                                myname = json_string_value(value2);
 
-                                printf ("%s(%s) is a dir, with 0755\n", path, dir_entry_name);
+                                if (strcmp (myname, "dir") == 0)
+                                {
+                                    mystat->st_mode = S_IFDIR | 0755;
+                                    mystat->st_nlink = 2;
 
-                                return mystat;
-                            }
-                            else if (strcmp(myname, "file") == 0)
-                            {
-                                mystat->st_mode = S_IFREG | 0444;
-                                mystat->st_nlink = 1;
-                                mystat->st_uid = getuid();
-                                mystat->st_gid = getgid();
+                                    printf ("%s(%s) is a dir, with 0755\n", path, dir_entry_name);
 
-                                printf ("%s(%s) is a file, with 0444\n", path, dir_entry_name);
+                                    return mystat;
+                                }
+                                else if (strcmp(myname, "file") == 0)
+                                {
+                                    mystat->st_mode = S_IFREG | 0444;
+                                    mystat->st_nlink = 1;
+                                    mystat->st_uid = getuid();
+                                    mystat->st_gid = getgid();
 
-                                return mystat;
+                                    printf ("%s(%s) is a file, with 0444\n", path, dir_entry_name);
+
+                                    return mystat;
+                                }
                             }
                         }
-                    }
 
-                    iter2 = json_object_iter_next(value, iter2);
+                        iter2 = json_object_iter_next(value, iter2);
+                    }
                 }
             }
             iter = json_object_iter_next(root, iter);
