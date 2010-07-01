@@ -26,7 +26,13 @@ struct stat * GDDI_getattr (const char * path)
     json_t * commits = NULL;
     int i = 0;
     char * myurl = NULL;
+
+    char * searchpath = NULL;
+    char * dir_entry_name = NULL;
     
+    searchpath = dirname(path);
+    /* searchpath = path; */
+    dir_entry_name = basename(path);
 
     mystat = malloc (sizeof (struct stat));
     if (!mystat)
@@ -35,23 +41,19 @@ struct stat * GDDI_getattr (const char * path)
         return NULL;
     }
 
-
-    printf ("%s ------------------- Fetching: %s%s/\n", __func__, getGridFSURL(), path);
-    if ((strlen(path) == 1) && (path[0] == '/'))
+    
+    printf ("%s ------------------- Fetching: %s%s on entry %s\n", __func__, getGridFSURL(), searchpath, dir_entry_name);
+    /* Query root */
+    if ((strlen(searchpath) == 1) && (searchpath[0] == '/'))
     {    
-        if (path[strlen(path) - 1] == '/')
-            mem = download (getGridFSURL(), path, 1);
-        else
-            mem = download (getGridFSURL(), path, 1);
+        mem = download (getGridFSURL(), NULL, 0);
     }
     else
     {
-        if (path[strlen(path) - 1] == '/')
-            mem = download (getGridFSURL(), path, 1);
-        else
-            mem = download (getGridFSURL(), (path), 1);
+        mem = download (getGridFSURL(), searchpath, 1);
     }
-    printf ("%s ------------------- Fetched:  %s%s/\n", __func__, getGridFSURL(), path);
+    printf ("%s ------------------- Fetched:  %s%s on entry %s  path = %s\n", __func__, getGridFSURL(), searchpath, dir_entry_name, path);
+    printf ("%s\n", path);
     
     /* Check on Django error */
     if (strstr(mem -> data, "NameError at"))

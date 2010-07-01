@@ -23,6 +23,8 @@ int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     buffer_t * mem = NULL;
     json_t * root = NULL;
     json_error_t json_error;
+    char * dir_entry_name = NULL;
+    void *iter = NULL;
 
 
     filler(buf, ".", NULL, 0);
@@ -38,7 +40,7 @@ int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     /* If no data is provided (yet) */
     if (!mem)
     {
-        return 0;
+        return -EPROTO;
     }
 
     root = json_loads (mem -> data, &json_error);
@@ -48,20 +50,18 @@ int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     if(!root)
     {
         fprintf(stderr, "error: on line %d: %s\n", json_error.line, json_error.text);
-        return 1;
+        return -EPROTO;
     }
 
     if(!json_is_object(root))
     {
         json_decref( root );
         fprintf(stderr, "error: root is not an object\n");
-        return 1;
+        return -EPROTO;
     }
     else
     {
-        /* obj is a JSON object */
-        char * dir_entry_name = NULL;
-        void *iter = json_object_iter(root);
+        iter = json_object_iter(root);
         while(iter)
         {
             dir_entry_name = json_object_iter_key(iter);

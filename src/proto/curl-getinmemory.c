@@ -67,6 +67,8 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
         strcat (mainurl, "/");
 
 
+    printf ("======================================================== Curl Fetching : %s\n", mainurl);
+
 
     chunk = malloc (sizeof(buffer_t));
 
