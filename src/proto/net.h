@@ -5,7 +5,17 @@
 #ifndef NET_H
 #define NET_H 1
 
+#ifdef HAVE_CONFIG
+# include <config.h>
+#endif
+
+#define APP_NAME "griddaamfs"
+#define APP_VERSION "0.1"
+
 #include <curl/curl.h>
+
+#define USERAGENT APP_NAME"/"APP_VERSION
+
 
 typedef struct buffer_s
 {

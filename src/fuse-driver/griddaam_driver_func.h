@@ -12,8 +12,8 @@
 #include <jansson.h>
 #include <libgen.h>
 
-#include "net.h"
-/* #include "curl-getinmemory.h" */
+/* #include "net.h" */
+#include "curl-getinmemory.h"
 
 
 #ifndef GRIDDAAM_DRIVER_FUNC_H

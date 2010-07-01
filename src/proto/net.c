@@ -16,6 +16,8 @@
 #include "util.h"
 #include "common.h"
 
+#include "net.h"
+
 #define INITIAL_SIZE 4096
 
 

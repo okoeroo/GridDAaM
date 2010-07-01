@@ -13,8 +13,10 @@ AM_CFLAGS = \
             -O2 -Wuninitialized \
             -D__FreeBSD__=10 -D__DARWIN_64_BIT_INO_T=1 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=27 \
             $(FUSE_CFLAGS) \
+            -I../ \
             -Icommon \
             -Iproto
+
 
 
 griddaamfs_SOURCES = \

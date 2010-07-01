@@ -12,7 +12,6 @@
 #include <jansson.h>
 #include <libgen.h>
 
-#include "net.h"
 #include "common.h"
 #include "griddaam_driver_func.h"
 
@@ -25,14 +24,17 @@ static const char *grid_str = "Hello World!\n";
 
 
 
+static int grid_opendir(const char *path, struct fuse_file_info *fi)
+{
+    return 0;
+}
 
 static int grid_open(const char *path, struct fuse_file_info *fi)
 {
-    if(strcmp(path, grid_path) != 0)
-        return -ENOENT;
-
+#if 0
     if((fi->flags & 3) != O_RDONLY)
         return -EACCES;
+#endif
 
     return 0;
 }
@@ -79,6 +81,7 @@ static const struct fuse_operations grid_oper = {
     .getattr    = grid_getattr,
     .readdir    = grid_readdir,
     .open       = grid_open,
+    .opendir    = grid_opendir,
     .read       = grid_read
 };
 

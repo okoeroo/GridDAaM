@@ -12,12 +12,9 @@
 #include <jansson.h>
 #include <libgen.h>
 
-#include "net.h"
-/* #include "curl-getinmemory.h" */
-
+#include "common.h"
 #include "griddaam_driver_func.h"
 
-#include "common.h"
 
 
 struct stat * GDDI_getattr (const char * path)
@@ -30,42 +27,38 @@ struct stat * GDDI_getattr (const char * path)
     int i = 0;
     char * myurl = NULL;
     
-    char * searchpath = NULL;
-
     printf ("%s: DEBUG: path %s\n", __FILE__, path);
     printf ("%s: DEBUG: basename %s\n", __FILE__, basename(path));
 
-    if (strncmp(basename(path), "._", 2) == 0)
+    if ((strncmp(basename(path), "._", 2) == 0) ||
+        (strncmp(basename(path), "/._", 3) == 0))
     {
-        return NULL;
-    }
-    else if (strncmp(basename(path), "/._", 3) == 0)
-    {
+        fprintf (stderr, "Ignoring OSX fork files\n");
         return NULL;
     }
 
-    printf ("creating stat object\n");
     mystat = malloc (sizeof (struct stat));
-    if (mystat)
+    if (!mystat)
     {
-        printf ("Got it!\n");
+        fprintf (stderr, "Error: couldn't allocate state object\n");
+        return NULL;
     }
 
-    myurl = getGridFSURL();
 
-    printf ("bar %d\n", strlen(getGridFSURL()));
+    printf ("%s ------------------- Fetching: %s%s/\n", __func__, getGridFSURL(), path);
+    if (path[strlen(path) - 1] == '/')
+        mem = download (getGridFSURL(), path, 1);
+    else
+        mem = download (getGridFSURL(), path, 1);
+    printf ("%s ------------------- Fetched:  %s%s/\n", __func__, getGridFSURL(), path);
+    
+    /* Check on Django error */
+    if (strstr(mem -> data, "NameError at"))
+    {
+        fprintf(stderr, "error: path \"%s\" doesn't exist\n", path);
+        return NULL;
+    }
 
-    printf ("URL: getGridFSURL() %s (%d)\n", getGridFSURL(), strlen(getGridFSURL()));
-    searchpath = malloc (sizeof (char) * (strlen(path) + strlen(getGridFSURL()) + 2));
-    strcpy (searchpath, getGridFSURL());
-    strcat (searchpath, path);
-
-
-    printf ("------------------- Fetching: %s\n", searchpath);
-    mem = download ((char *) searchpath);
-    printf ("------------------- Fetched : %s\n", searchpath);
-
-    /* printf ("%s\n", mem -> data); */
 
     root = json_loads (mem -> data, &json_error);
     free (mem -> data);
@@ -74,14 +67,14 @@ struct stat * GDDI_getattr (const char * path)
     if(!root)
     {
         fprintf(stderr, "error: on line %d: %s\n", json_error.line, json_error.text);
-        return 1;
+        return NULL;
     }
 
     if( !json_is_object( root ) )
     {
         json_decref( root );
         fprintf(stderr, "error: root is not an object\n");
-        return 1;
+        return NULL;
     }
     else
     {
@@ -91,8 +84,6 @@ struct stat * GDDI_getattr (const char * path)
         void *iter = json_object_iter(root);
         while(iter)
         {
-            json_t *value;
-
             dir_entry_name = json_object_iter_key(iter);
             value = json_object_iter_value(iter);
 
@@ -101,8 +92,6 @@ struct stat * GDDI_getattr (const char * path)
             if (json_is_object (value))
             {
                 void *iter2;
-
-                printf ("object\n");
 
                 iter2 = json_object_iter(value);
                 while (iter2)
@@ -119,14 +108,16 @@ struct stat * GDDI_getattr (const char * path)
                     {
                         if(json_is_string(value2))
                         {
-                            printf ("Yes, value 2 is a string\n");
                             myname = json_string_value(value2);
 
                             if (strcmp (myname, "dir") == 0)
                             {
                                 mystat->st_mode = S_IFDIR | 0755;
-                                mystat->st_nlink = 2;
-                                break;
+                                mystat->st_nlink = 3;
+
+                                printf ("%s(%s) is a dir, with 0755\n", path, dir_entry_name);
+
+                                return mystat;
                             }
                             else if (strcmp(myname, "file") == 0)
                             {
@@ -134,12 +125,13 @@ struct stat * GDDI_getattr (const char * path)
                                 mystat->st_nlink = 1;
                                 mystat->st_uid = getuid();
                                 mystat->st_gid = getgid();
-                                break;
+
+                                printf ("%s(%s) is a file, with 0444\n", path, dir_entry_name);
+
+                                return mystat;
                             }
                         }
                     }
-
-                    /* break; */
 
                     iter2 = json_object_iter_next(value, iter2);
                 }
@@ -177,11 +169,6 @@ int grid_getattr(const char *path, struct stat *stbuf)
         res = -ENOENT;
     }
     else
-#if 0
-    {
-        res = -ENOENT;
-    }    
-#else
     {
         /* Query for information */
         printf ("Querying info for: %s\n", path);
@@ -193,13 +180,14 @@ int grid_getattr(const char *path, struct stat *stbuf)
             stbuf->st_nlink = mystat->st_nlink;
             stbuf->st_uid   = getuid();
             stbuf->st_gid   = getgid();
+
+            free(mystat);
         }
         else
         {
             res = -ENOENT;
         }
     }
-#endif
 
     return res;
 }

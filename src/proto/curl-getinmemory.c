@@ -25,36 +25,72 @@ static void *myrealloc(void *ptr, size_t size)
 WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
     size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)data;
+    buffer_t *mem = (buffer_t*)data;
 
-    mem->memory = myrealloc(mem->memory, mem->size + realsize + 1);
-    if (mem->memory) {
-        memcpy(&(mem->memory[mem->size]), ptr, realsize);
+    mem->data= myrealloc(mem->data, mem->size + realsize + 1);
+    if (mem->data) {
+        memcpy(&(mem->data[mem->size]), ptr, realsize);
         mem->size += realsize;
-        mem->memory[mem->size] = 0;
+        mem->data[mem->size] = 0;
     }
     return realsize;
 }
 
-struct MemoryStruct * download (char * url)
+buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 {
     CURL *curl_handle;
+    /* static struct curl_slist *headers = NULL; */
+    char * mainurl = NULL;
+    int len = 0;
 
-    struct MemoryStruct * chunk = NULL;
+    buffer_t * chunk = NULL;
 
-    chunk = malloc (sizeof(struct MemoryStruct));
+    if (!baseurl)
+    {
+        fprintf (stderr, "Error: no URL specified\n");
+        return NULL;
+    }
 
-    chunk -> memory=NULL; /* we expect realloc(NULL, size) to work */ 
+    len += strlen(baseurl);
+    if (urlpath)
+        len += strlen(urlpath);
+
+    if (trailling_slash)
+        len++;
+
+    mainurl = malloc (sizeof (char) * (len + 1));
+    strcpy (mainurl, baseurl);
+    if (urlpath)
+        strcat (mainurl, urlpath);
+
+    if (trailling_slash)
+        strcat (mainurl, "/");
+
+
+
+    chunk = malloc (sizeof(buffer_t));
+
+    chunk -> data = NULL; /* we expect realloc(NULL, size) to work */ 
     chunk -> size = 0;    /* no data at this point */ 
+
+    /* printf ("Creating headers Accept and Content-Type\n"); */
+/*  */
+    /* headers = slist_append ( headers, "Accept: %s", MIMETYPE_JSON); */
+    /* printf ("Creating headers Accept and Content-Type\n"); */
+    /* headers = slist_append ( headers, "Content-Type: %s", MIMETYPE_JSON); */
+/*  */
+    /* printf ("Creating headers Accept and Content-Type\n"); */
 
     curl_global_init(CURL_GLOBAL_ALL);
 
     /* init the curl session */ 
     curl_handle = curl_easy_init();
 
+    /* printf ("Creating headers Accept and Content-Type\n"); */
+    /* curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers); */
+
     /* specify URL to get */ 
-    /* curl_easy_setopt(curl_handle, CURLOPT_URL, "http://cool.haxx.se/"); */
-    curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+    curl_easy_setopt(curl_handle, CURLOPT_URL, mainurl);
 
     /* send all data to this function  */ 
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -64,7 +100,7 @@ struct MemoryStruct * download (char * url)
 
     /* some servers don't like requests that are made without a user-agent
        field, so we provide one */ 
-    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, USERAGENT);
 
     /* get it! */ 
     curl_easy_perform(curl_handle);
@@ -83,7 +119,7 @@ struct MemoryStruct * download (char * url)
      * you're done with it, you should free() it as a nice application.
      */ 
 
-    printf ("foo!\n%s\n", chunk -> memory);
+    printf ("foo!\n%s\n", chunk -> data);
 
 
     /*
