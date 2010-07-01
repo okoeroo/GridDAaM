@@ -25,9 +25,6 @@ int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     json_error_t json_error;
 
 
-    if(strcmp(path, "/") != 0)
-        return -ENOENT;
-
     filler(buf, ".", NULL, 0);
     filler(buf, "..", NULL, 0);
 

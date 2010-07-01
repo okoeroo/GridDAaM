@@ -27,15 +27,6 @@ struct stat * GDDI_getattr (const char * path)
     int i = 0;
     char * myurl = NULL;
     
-    printf ("%s: DEBUG: path %s\n", __FILE__, path);
-    printf ("%s: DEBUG: basename %s\n", __FILE__, basename(path));
-
-    if ((strncmp(basename(path), "._", 2) == 0) ||
-        (strncmp(basename(path), "/._", 3) == 0))
-    {
-        fprintf (stderr, "Ignoring OSX fork files\n");
-        return NULL;
-    }
 
     mystat = malloc (sizeof (struct stat));
     if (!mystat)
@@ -46,10 +37,20 @@ struct stat * GDDI_getattr (const char * path)
 
 
     printf ("%s ------------------- Fetching: %s%s/\n", __func__, getGridFSURL(), path);
-    if (path[strlen(path) - 1] == '/')
-        mem = download (getGridFSURL(), path, 1);
+    if ((strlen(path) == 1) && (path[0] == '/'))
+    {    
+        if (path[strlen(path) - 1] == '/')
+            mem = download (getGridFSURL(), path, 1);
+        else
+            mem = download (getGridFSURL(), path, 1);
+    }
     else
-        mem = download (getGridFSURL(), path, 1);
+    {
+        if (path[strlen(path) - 1] == '/')
+            mem = download (getGridFSURL(), path, 1);
+        else
+            mem = download (getGridFSURL(), (path), 1);
+    }
     printf ("%s ------------------- Fetched:  %s%s/\n", __func__, getGridFSURL(), path);
     
     /* Check on Django error */
@@ -113,7 +114,7 @@ struct stat * GDDI_getattr (const char * path)
                             if (strcmp (myname, "dir") == 0)
                             {
                                 mystat->st_mode = S_IFDIR | 0755;
-                                mystat->st_nlink = 3;
+                                mystat->st_nlink = 2;
 
                                 printf ("%s(%s) is a dir, with 0755\n", path, dir_entry_name);
 

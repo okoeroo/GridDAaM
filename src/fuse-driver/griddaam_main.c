@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
     setGridFSURL(url);
     printf ("Contact URL is: %s\n", getGridFSURL());
 
+
     /* return fuse_main(argc, argv, &grid_oper); */
     return fuse_main(argc, argv, &grid_oper, NULL);
 }
