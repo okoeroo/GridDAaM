@@ -39,7 +39,7 @@ WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 {
     CURL *curl_handle;
-    /* static struct curl_slist *headers = NULL; */
+    static struct curl_slist *headers = NULL;
     char * mainurl = NULL;
     int len = 0;
 
@@ -73,21 +73,18 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
     chunk -> data = NULL; /* we expect realloc(NULL, size) to work */ 
     chunk -> size = 0;    /* no data at this point */ 
 
-    /* printf ("Creating headers Accept and Content-Type\n"); */
-/*  */
-    /* headers = slist_append ( headers, "Accept: %s", MIMETYPE_JSON); */
-    /* printf ("Creating headers Accept and Content-Type\n"); */
-    /* headers = slist_append ( headers, "Content-Type: %s", MIMETYPE_JSON); */
-/*  */
-    /* printf ("Creating headers Accept and Content-Type\n"); */
-
     curl_global_init(CURL_GLOBAL_ALL);
+
+
+    printf ("Creating headers Accept and Content-Type\n");
+    headers = curl_slist_append ( headers, "Accept: "MIMETYPE_JSON);
+    headers = curl_slist_append ( headers, "Content-Type: "MIMETYPE_JSON);
+
 
     /* init the curl session */ 
     curl_handle = curl_easy_init();
 
-    /* printf ("Creating headers Accept and Content-Type\n"); */
-    /* curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers); */
+    curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, headers);
 
     /* specify URL to get */ 
     curl_easy_setopt(curl_handle, CURLOPT_URL, mainurl);

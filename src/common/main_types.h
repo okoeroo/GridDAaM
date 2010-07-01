@@ -11,7 +11,8 @@
 
 
 #define USERAGENT PACKAGE_NAME"/"PACKAGE_VERSION
-#define MIMETYPE_JSON "application/json"
+/* #define MIMETYPE_JSON "application/json" */
+#define MIMETYPE_JSON "application/GridDAam+json"
 
 
 typedef struct buffer_s
