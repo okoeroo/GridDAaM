@@ -7,6 +7,7 @@
 #include <curl/easy.h>
 
 #include "main_types.h"
+#include "curl-getinmemory.h"
 
 
 static void *myrealloc(void *ptr, size_t size);
@@ -51,6 +52,7 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
         return NULL;
     }
 
+    /* Construct URL */
     len += strlen(baseurl);
     if (urlpath)
         len += strlen(urlpath);
@@ -66,8 +68,14 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
     if (trailling_slash)
         strcat (mainurl, "/");
 
-
     printf ("======================================================== Curl Fetching : %s\n", mainurl);
+
+    /* Check cache'd data */
+    if (chunk = cache_fetch (mainurl))
+    {
+        return chunk;
+    }
+    
 
 
     chunk = malloc (sizeof(buffer_t));
@@ -121,6 +129,9 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
     printf ("foo!\n%s\n", chunk -> data);
 
 
+
+    printf ("Cache data\n");
+    cache_add (mainurl, chunk);
     /*
     if(chunk -> memory)
         free(chunk -> memory);

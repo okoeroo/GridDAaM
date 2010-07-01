@@ -15,11 +15,14 @@
 #define MIMETYPE_JSON "application/GridDAam+json"
 
 
+#define CACHE_TTL 60
+
+
 typedef struct buffer_s
 {
     char *data;
     size_t size;
-    size_t pos;
+    size_t offset;
 } buffer_t;
 
 #endif /* MAIN_TYPES_H */
