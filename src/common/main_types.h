@@ -5,18 +5,18 @@
 #ifdef HAVE_CONFIG
     #include <config.h>
 #else
-    #define PACKAGE_NAME "griddaamfs"
+    #define PACKAGE_NAME    "griddaamfs"
     #define PACKAGE_VERSION "0.1"
 #endif
 
 
-#define USERAGENT PACKAGE_NAME"/"PACKAGE_VERSION
+#define USERAGENT           PACKAGE_NAME"/"PACKAGE_VERSION
 /* #define MIMETYPE_JSON "application/json" */
-#define MIMETYPE_JSON "application/GridDAam+json"
+#define MIMETYPE_JSON       "application/GridDAam+json"
 
 
-#define CACHE_TTL 60
-
+#define CACHE_TTL           60
+#define DEFAULT_DIR_SIZE    4096
 
 typedef struct buffer_s
 {

@@ -118,6 +118,7 @@ struct stat * GDDI_getattr (const char * path)
                                     mystat->st_nlink = 2;
                                     mystat->st_uid = getuid();
                                     mystat->st_gid = getgid();
+                                    mystat->st_size = DEFAULT_DIR_SIZE;
                                 }
                                 else if (strcmp(myname, "file") == 0)
                                 {
