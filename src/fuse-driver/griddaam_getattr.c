@@ -38,7 +38,7 @@ struct stat * GDDI_getattr (const char * path)
     /* searchpath = path; */
     path_base = basename(path);
 
-    mystat = malloc (sizeof (struct stat));
+    mystat = calloc (1, sizeof (struct stat));
     if (!mystat)
     {
         fprintf (stderr, "Error: couldn't allocate state object\n");
