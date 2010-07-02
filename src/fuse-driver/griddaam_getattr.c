@@ -106,7 +106,6 @@ struct stat * GDDI_getattr (const char * path)
                         key2 = json_object_iter_key(iter2);
                         value2 = json_object_iter_value(iter2);
 
-                        printf ("Key2 is: %s\n", key2);
                         if (strcmp(key2, "type") == 0)
                         {
                             if(json_is_string(value2))
@@ -117,10 +116,8 @@ struct stat * GDDI_getattr (const char * path)
                                 {
                                     mystat->st_mode = S_IFDIR | 0755;
                                     mystat->st_nlink = 2;
-
-                                    printf ("%s(%s) is a dir, with 0755\n", path, dir_entry_name);
-
-                                    return mystat;
+                                    mystat->st_uid = getuid();
+                                    mystat->st_gid = getgid();
                                 }
                                 else if (strcmp(myname, "file") == 0)
                                 {
@@ -128,16 +125,20 @@ struct stat * GDDI_getattr (const char * path)
                                     mystat->st_nlink = 1;
                                     mystat->st_uid = getuid();
                                     mystat->st_gid = getgid();
-
-                                    printf ("%s(%s) is a file, with 0444\n", path, dir_entry_name);
-
-                                    return mystat;
                                 }
+                            }
+                        }
+                        else if (strcmp(key2, "size") == 0)
+                        {
+                            if(json_is_integer(value2))
+                            {
+                                mystat->st_size = json_integer_value(value2);
                             }
                         }
 
                         iter2 = json_object_iter_next(value, iter2);
                     }
+                    return mystat;
                 }
             }
             iter = json_object_iter_next(root, iter);
@@ -146,7 +147,7 @@ struct stat * GDDI_getattr (const char * path)
     /* Ref-counter lowering */
     json_decref(root);
 
-    return mystat;
+    return NULL;
 }
 
 
@@ -184,6 +185,7 @@ int grid_getattr(const char *path, struct stat *stbuf)
             stbuf->st_nlink = mystat->st_nlink;
             stbuf->st_uid   = getuid();
             stbuf->st_gid   = getgid();
+            stbuf->st_size  = mystat->st_size;
 
             free(mystat);
         }
