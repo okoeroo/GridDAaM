@@ -91,7 +91,9 @@ struct stat * GDDI_getattr (const char * path)
             dir_entry_name = json_object_iter_key(iter);
             value = json_object_iter_value(iter);
 
+#ifdef DEBUG
             printf ("Key is: %s\n", dir_entry_name);
+#endif
             if (strcmp(dir_entry_name, path_base) == 0)
             {
                 if (json_is_object (value))
@@ -167,17 +169,23 @@ int grid_getattr(const char *path, struct stat *stbuf)
         stbuf->st_nlink = 2;
     }
     else if(strncmp(basename(path), "/._", 3) == 0) {
+#ifdef DEBUG
         printf ("Source fork file\n");
+#endif
         res = -ENOENT;
     }
     else if(strncmp(basename(path), "._", 2) == 0) {
+#ifdef DEBUG
         printf ("Source fork file\n");
+#endif
         res = -ENOENT;
     }
     else
     {
         /* Query for information */
+#ifdef DEBUG
         printf ("Querying info for: %s\n", path);
+#endif
 
         mystat = GDDI_getattr (path);
         if (mystat)

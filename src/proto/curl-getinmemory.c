@@ -22,8 +22,8 @@ static void *myrealloc(void *ptr, size_t size)
         return malloc(size);
 }
 
-    static size_t
-WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
+
+static size_t WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
 {
     size_t realsize = size * nmemb;
     buffer_t *mem = (buffer_t*)data;
@@ -35,6 +35,26 @@ WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data)
         mem->data[mem->size] = 0;
     }
     return realsize;
+}
+
+
+static size_t read_callback( void *ptr, size_t size, size_t nmemb, void *data )
+{
+    buffer_t * buf = (buffer_t *) data;
+
+    int length = size * nmemb;
+    int left = buf->size - buf->offset;
+
+    if( left < length )
+        length = left;
+
+    if( length <= 0 )
+        return 0;
+
+    memcpy( ptr, buf->data, length );
+    buf->offset += length;
+
+    return length;
 }
 
 buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
@@ -130,7 +150,6 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 
 
 
-    printf ("Cache data\n");
     cache_add (mainurl, chunk);
     /*
     if(chunk -> memory)
@@ -139,8 +158,75 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 
 
     /* we're done with libcurl, so clean it up */ 
+    free(mainurl);
     curl_global_cleanup();
 
     return chunk;
 }
+
+
+int upload(const char * baseurl, const char * urlpath)
+{
+    CURL *curl;
+    CURLcode res;
+    char * mainurl = NULL;
+    int len = 0;
+
+    if (!baseurl)
+    {
+        fprintf (stderr, "Error: no URL specified\n");
+        return 1;
+    }
+
+    /* Construct URL */
+    len += strlen(baseurl);
+    if (urlpath)
+        len += strlen(urlpath);
+
+    mainurl = malloc (sizeof (char) * (len + 1));
+    strcpy (mainurl, baseurl);
+    if (urlpath)
+        strcat (mainurl, urlpath);
+
+    /* In windows, this will init the winsock stuff */ 
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    /* get a curl handle */ 
+    curl = curl_easy_init();
+    if(curl) 
+    {
+        /* we want to use our own read function */ 
+        /* curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback); */
+
+        /* enable uploading */ 
+        /* curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L); */
+
+        /* HTTP PUT please */ 
+        curl_easy_setopt(curl, CURLOPT_PUT, 1L);
+
+        /* specify target URL, and note that this URL should include a file
+           name, not only a directory */ 
+        curl_easy_setopt(curl, CURLOPT_URL, mainurl);
+
+        /* now specify which file to upload */ 
+        /* curl_easy_setopt(curl, CURLOPT_READDATA, hd_src); */
+
+        /* provide the size of the upload, we specicially typecast the value
+           to curl_off_t since we must be sure to use the correct data size */ 
+        /* curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t)file_info.st_size); */
+
+        /* Now run off and do what you've been told! */ 
+        res = curl_easy_perform(curl);
+
+        /* always cleanup */ 
+        curl_easy_cleanup(curl);
+    }
+    else
+        return 1;
+
+    free(mainurl);
+    curl_global_cleanup();
+    return 0;
+}
+
 

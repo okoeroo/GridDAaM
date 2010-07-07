@@ -30,6 +30,7 @@ struct stat * GDDI_getattr (const char * path);
 int grid_getattr(const char *path, struct stat *stbuf);
 int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi);
+int grid_mkdir(const char *path, mode_t mode);
 
 
 #endif /* GRIDDAAM_DRIVER_FUNC_H */

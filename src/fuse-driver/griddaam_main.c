@@ -23,6 +23,8 @@ const char *url = "http://asen.nikhef.nl:8000";
 static const char *grid_str = "Hello World!\n";
 
 
+static int grid_opt_proc( void *data, const char *arg, int key, struct fuse_args *outargs );
+
 
 static int grid_opendir(const char *path, struct fuse_file_info *fi)
 {
@@ -78,6 +80,7 @@ static int grid_read(const char *path, char *buf, size_t size, off_t offset,
 
 /* const struct fuse_operations  *      op */
 static const struct fuse_operations grid_oper = {
+    .mkdir      = grid_mkdir,
     .getattr    = grid_getattr,
     .readdir    = grid_readdir,
     .open       = grid_open,
@@ -86,13 +89,48 @@ static const struct fuse_operations grid_oper = {
 };
 
 
+static int grid_opt_proc( void *data, const char *arg, int key, struct fuse_args *outargs )
+{
+    (void)data;
+    (void)outargs;
+    switch( key )
+    {
+        case FUSE_OPT_KEY_NONOPT:
+            if(getGridFSURL() == NULL )
+            {
+                setGridFSURL(arg);
+                return 0;
+            }
+            return 1;
+        default:
+            return 1;
+    }
+}
+
+
+
 int main(int argc, char *argv[])
 {
-    setGridFSURL(url);
+    int ret = 0;
+    struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
+
+    if( fuse_opt_parse(&args, NULL, NULL, grid_opt_proc) == -1 )
+        return -1;
+
+    if(getGridFSURL() == NULL )
+    {
+        fprintf (stderr, "No Grid URI to mount\n");
+        return 1;
+    }
+
     printf ("Contact URL is: %s\n", getGridFSURL());
+    ret = fuse_main(args.argc, args.argv, &grid_oper, NULL);
 
+    if (ret)
+        printf("\n");
 
-    /* return fuse_main(argc, argv, &grid_oper); */
-    return fuse_main(argc, argv, &grid_oper, NULL);
+    fuse_opt_free_args(&args);
+
+    return ret;
 }
 

@@ -69,7 +69,9 @@ int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             if( dir_entry_name[strlen(dir_entry_name) - 1] == '/' )
                 dir_entry_name[strlen(dir_entry_name) - 1] = '\0';
 
+#ifdef DEBUG
             printf ("Key is: %s\n", dir_entry_name);
+#endif
             filler(buf, dir_entry_name, NULL, 0);
 
             iter = json_object_iter_next(root, iter);
