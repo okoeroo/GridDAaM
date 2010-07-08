@@ -13,6 +13,7 @@
 #define USERAGENT           PACKAGE_NAME"/"PACKAGE_VERSION
 /* #define MIMETYPE_JSON "application/json" */
 #define MIMETYPE_JSON       "application/GridDAam+json"
+#define X_STORAGE_URI       "X-Storage_URI: "
 
 
 #define CACHE_TTL           60

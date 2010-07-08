@@ -19,13 +19,6 @@
 #ifndef GRIDDAAM_DRIVER_FUNC_H
     #define GRIDDAAM_DRIVER_FUNC_H
 
-static const char *grid_path = "/grid";
-
-
-static const char * debug_file = "debug";
-
-
-
 struct stat * GDDI_getattr (const char * path);
 int grid_getattr(const char *path, struct stat *stbuf);
 int grid_readdir(const char *path, void *buf, fuse_fill_dir_t filler,

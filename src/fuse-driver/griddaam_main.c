@@ -16,13 +16,6 @@
 #include "griddaam_driver_func.h"
 
 
-/* static const char *grid_str = "Hello World!\n"; */
-/* static const char *grid_path = "/grid"; */
-/* const char * debug_file = "debug"; */
-const char *url = "http://asen.nikhef.nl:8000";
-static const char *grid_str = "Hello World!\n";
-
-
 static int grid_opt_proc( void *data, const char *arg, int key, struct fuse_args *outargs );
 
 
@@ -33,50 +26,15 @@ static int grid_opendir(const char *path, struct fuse_file_info *fi)
 
 static int grid_open(const char *path, struct fuse_file_info *fi)
 {
-#if 0
-    if((fi->flags & 3) != O_RDONLY)
-        return -EACCES;
-#endif
-
     return 0;
 }
 
 static int grid_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi)
 {
-    size_t len;
-    (void) fi;
-
-#if 0
-    if (strcmp(basename(path), debug_file))
-    {
-        len = strlen(debug_output);
-        if (offset < len)
-        {
-            if (offset + size > len)
-                size = len - offset;
-            memcpy(buf, grid_str + offset, size);
-        }
-        else
-            size = 0;
-
-        return 0
-    }
-#endif
-
-    if(strcmp(path, grid_path) != 0)
-        return -ENOENT;
-
-    len = strlen(grid_str);
-    if (offset < len) {
-        if (offset + size > len)
-            size = len - offset;
-        memcpy(buf, grid_str + offset, size);
-    } else
-        size = 0;
-
-    return size;
+    return 0;
 }
+
 
 /* const struct fuse_operations  *      op */
 static const struct fuse_operations grid_oper = {
@@ -124,7 +82,8 @@ int main(int argc, char *argv[])
     }
 
     printf ("Contact URL is: %s\n", getGridFSURL());
-    ret = fuse_main(args.argc, args.argv, &grid_oper, NULL);
+    /* ret = fuse_main(args.argc, args.argv, &grid_oper, NULL); */
+    ret = fuse_main(argc - 1, argv + 1, &grid_oper, NULL);
 
     if (ret)
         printf("\n");

@@ -22,7 +22,7 @@ int grid_mkdir(const char *path, mode_t mode)
 
     /* Touch the path */
     printf ("%s ------------------- Putting: %s%s/\n", __func__, getGridFSURL(), path);
-    res = upload (getGridFSURL(), path);
+    res = upload (getGridFSURL(), path, NULL, 1);
     printf ("%s ------------------- Fetching: %s%s/\n", __func__, getGridFSURL(), path);
 
     return res;

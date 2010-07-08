@@ -91,7 +91,7 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
     printf ("======================================================== Curl Fetching : %s\n", mainurl);
 
     /* Check cache'd data */
-    if (chunk = cache_fetch (mainurl))
+    if ((chunk = cache_fetch (mainurl)))
     {
         return chunk;
     }
@@ -106,7 +106,6 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
     curl_global_init(CURL_GLOBAL_ALL);
 
 
-    printf ("Creating headers Accept and Content-Type\n");
     headers = curl_slist_append ( headers, "Accept: "MIMETYPE_JSON);
     headers = curl_slist_append ( headers, "Content-Type: "MIMETYPE_JSON);
 
@@ -146,10 +145,6 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
      * you're done with it, you should free() it as a nice application.
      */ 
 
-    printf ("foo!\n%s\n", chunk -> data);
-
-
-
     cache_add (mainurl, chunk);
     /*
     if(chunk -> memory)
@@ -165,12 +160,15 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 }
 
 
-int upload(const char * baseurl, const char * urlpath)
+int upload(const char * baseurl, const char * urlpath, const char * storage_uri, short trailling_slash)
 {
     CURL *curl;
     CURLcode res;
+    int rc = 0;
     char * mainurl = NULL;
     int len = 0;
+    static struct curl_slist *headers = NULL;
+    char * storage_uri_header = NULL;
 
     if (!baseurl)
     {
@@ -183,10 +181,16 @@ int upload(const char * baseurl, const char * urlpath)
     if (urlpath)
         len += strlen(urlpath);
 
+    if (trailling_slash)
+        len++;
+
     mainurl = malloc (sizeof (char) * (len + 1));
     strcpy (mainurl, baseurl);
     if (urlpath)
         strcat (mainurl, urlpath);
+
+    if (trailling_slash)
+        strcat (mainurl, "/");
 
     /* In windows, this will init the winsock stuff */ 
     curl_global_init(CURL_GLOBAL_ALL);
@@ -204,6 +208,16 @@ int upload(const char * baseurl, const char * urlpath)
         /* HTTP PUT please */ 
         curl_easy_setopt(curl, CURLOPT_PUT, 1L);
 
+        if (storage_uri)
+        {
+            storage_uri_header = malloc (sizeof(char) * (strlen(X_STORAGE_URI) + strlen(storage_uri) + 1));
+            strcpy (storage_uri_header, X_STORAGE_URI);
+            strcat (storage_uri_header, storage_uri);
+            headers = curl_slist_append (headers, storage_uri_header);
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+            free(storage_uri_header);
+        }
+
         /* specify target URL, and note that this URL should include a file
            name, not only a directory */ 
         curl_easy_setopt(curl, CURLOPT_URL, mainurl);
@@ -217,16 +231,20 @@ int upload(const char * baseurl, const char * urlpath)
 
         /* Now run off and do what you've been told! */ 
         res = curl_easy_perform(curl);
-
-        /* always cleanup */ 
-        curl_easy_cleanup(curl);
+        if( res != CURLE_OK )
+        {
+            rc = 1;
+        }
+        else
+            rc = 0;
     }
     else
         return 1;
 
+    /* always cleanup */ 
     free(mainurl);
     curl_global_cleanup();
-    return 0;
+    return rc;
 }
 
 

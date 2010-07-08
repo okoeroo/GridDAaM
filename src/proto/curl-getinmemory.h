@@ -6,7 +6,7 @@
 
 
 buffer_t * download (char * baseurl, char * urlpath, short trailling_slash);
-int upload(const char * baseurl, const char * urlpath);
+int upload(const char * baseurl, const char * urlpath, const char * storage_uri, short trailling_slash);
 
 
 #endif /* FOO_H */
