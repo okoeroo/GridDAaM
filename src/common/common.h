@@ -13,6 +13,8 @@
 
 void setGridFSURL (char * url);
 char * getGridFSURL (void);
+void setScratchDir (char * path);
+char * getScratchDir (void);
 
 extern struct curl_slist *slist_append( struct curl_slist * list, const char * format, ... );
 time_t iso8601_decode( const char *isoformat );

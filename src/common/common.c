@@ -2,7 +2,27 @@
 #include <curl/curl.h>
 
 
-static char * gridFSURL = NULL;
+static char * gridFSURL   = NULL;
+static char * scratch_dir = NULL;
+
+
+
+void setScratchDir (char * path)
+{
+    if (path)
+    {
+        free(scratch_dir);
+        scratch_dir = NULL;
+
+        scratch_dir = calloc (1, sizeof(char) * (strlen(path) + 1));
+        memcpy (scratch_dir, path, strlen(path));
+    }
+}
+
+char * getScratchDir (void)
+{
+    return scratch_dir;
+}
 
 
 void setGridFSURL (char * url)

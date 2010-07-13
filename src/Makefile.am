@@ -3,24 +3,36 @@ bin_PROGRAMS = griddaamfs
 # -ansi
 
 
+#   AM_CFLAGS = \
+#               -g -W -Wall -pedantic -Wbad-function-cast -Wcast-align \
+#               -Wcast-qual -Wchar-subscripts -Winline \
+#               -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
+#               -Wredundant-decls -Wshadow -Wstrict-prototypes \
+#               -Wpointer-arith -Wno-long-long \
+#               -Wcomment -Wmissing-include-dirs \
+#               -O3 -Wuninitialized \
+#               -D__FreeBSD__=10 -D__DARWIN_64_BIT_INO_T=1 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=27 \
+#               $(FUSE_CFLAGS) \
+#               -I../ \
+#               -Icommon \
+#               -Iproto
+
 AM_CFLAGS = \
-            -g -W -Wall -pedantic -Wbad-function-cast -Wcast-align \
-            -Wcast-qual -Wchar-subscripts -Winline \
-            -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
-            -Wredundant-decls -Wshadow -Wstrict-prototypes \
-            -Wpointer-arith -Wno-long-long \
-            -Wcomment -Wmissing-include-dirs \
+            -g -W -Wall \
+            -Wmissing-prototypes \
+            -Wredundant-decls -Wshadow \
             -O3 -Wuninitialized \
             -D__FreeBSD__=10 -D__DARWIN_64_BIT_INO_T=1 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=27 \
             $(FUSE_CFLAGS) \
             -I../ \
+            -Ilogging \
             -Icommon \
             -Iproto
 
 
-
 griddaamfs_SOURCES = \
         common/common.c \
+        logging/mylog.c \
         proto/cache.c \
 		proto/curl-getinmemory.c \
         fuse-driver/griddaam_mkdir.c \
