@@ -2,7 +2,7 @@ SUBDIRS = src
 dist_doc_DATA = README
 
 MAIN_FS_URI="http://asen.nikhef.nl:8000"
-MOUNT_POINT=./test/
+MOUNT_POINT=`pwd`/test/
 BIN="./src/griddaamfs"
 
 mount: all

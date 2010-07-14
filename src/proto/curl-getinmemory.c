@@ -58,7 +58,7 @@ static size_t read_callback( void *ptr, size_t size, size_t nmemb, void *data )
     return length;
 }
 
-buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
+buffer_t * download (const char * baseurl, const char * urlpath, const short trailling_slash)
 {
     CURL *curl_handle;
     static struct curl_slist *headers = NULL;
@@ -161,7 +161,7 @@ buffer_t * download (char * baseurl, char * urlpath, short trailling_slash)
 }
 
 
-int upload(const char * baseurl, const char * urlpath, const char * storage_uri, short trailling_slash)
+int upload(const char * baseurl, const char * urlpath, const char * storage_uri, const short trailling_slash)
 {
     CURL *curl;
     CURLcode res;

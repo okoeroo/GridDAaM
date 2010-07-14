@@ -23,15 +23,15 @@ struct stat * GDDI_getattr (const char * path)
     buffer_t * mem = NULL;
     json_t * root = NULL;
     json_error_t json_error;
-    json_t * commits = NULL;
     json_t *value = NULL;
     void *iter = NULL;
     void *iter2 = NULL;
-    int i = 0;
-    char * myurl = NULL;
 
-    char * searchpath = NULL;
-    char * path_base = NULL;
+    const char *key2 = NULL;
+    json_t *value2 = NULL;
+    const char * myname = NULL;
+    const char * searchpath = NULL;
+    const char * path_base = NULL;
     char * dir_entry_name = NULL;
     
     searchpath = dirname(path);
@@ -101,9 +101,6 @@ struct stat * GDDI_getattr (const char * path)
                     iter2 = json_object_iter(value);
                     while (iter2)
                     {
-                        const char *key2;
-                        json_t *value2;
-                        char * myname = NULL;
 
                         key2 = json_object_iter_key(iter2);
                         value2 = json_object_iter_value(iter2);
@@ -168,13 +165,13 @@ int grid_getattr(const char *path, struct stat *stbuf)
         stbuf->st_mode = S_IFDIR | 0755;
         stbuf->st_nlink = 2;
     }
-    else if(strncmp(basename(path), "/._", 3) == 0) {
+    else if(strncmp((char *)basename(path), "/._", 3) == 0) {
 #ifdef DEBUG
         printf ("Source fork file\n");
 #endif
         res = -ENOENT;
     }
-    else if(strncmp(basename(path), "._", 2) == 0) {
+    else if(strncmp((char *)basename(path), "._", 2) == 0) {
 #ifdef DEBUG
         printf ("Source fork file\n");
 #endif

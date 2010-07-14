@@ -34,35 +34,16 @@ static const struct fuse_opt fuse_helper_opts[] = {
     FUSE_OPT_END
 };
 
-
 static int grid_opt_proc( void *data, const char *arg, int key, struct fuse_args *outargs );
 
 
-static int grid_opendir(const char *path, struct fuse_file_info *fi)
-{
-    return 0;
-}
-
-static int grid_open(const char *path, struct fuse_file_info *fi)
-{
-    return 0;
-}
-
-static int grid_read(const char *path, char *buf, size_t size, off_t offset,
-                      struct fuse_file_info *fi)
-{
-    return 0;
-}
-
-
-/* const struct fuse_operations  *      op */
+/*****************************************************/
 static const struct fuse_operations grid_oper = {
     .getattr    = grid_getattr,
     .mkdir      = grid_mkdir,
     .create     = grid_create,
     .readdir    = grid_readdir,
     .open       = grid_open,
-    .opendir    = grid_opendir,
     .read       = grid_read
 };
 
@@ -93,9 +74,8 @@ static int grid_opt_proc( void *data, const char *arg, int key, struct fuse_args
 
 int main(int argc, char *argv[])
 {
-    int i = 0, ret = 0;
+    int ret = 0;
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
-    char * mount_point = "test/";
 
     mkdir("/tmp/griddaam_scratch", 0755);
     setScratchDir ("/tmp/griddaam_scratch");
@@ -104,23 +84,13 @@ int main(int argc, char *argv[])
 
 
 
+#if 0
     ret = system ("uricopy.sh -force -mkdirs srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse/testfile file:///tmp/griddaam_scratch/foobar");
     printf ("Return value is: %d\n", ret);
 
     return 0;
-
-#if 0
-    for (i = 0; i < argc; i++)
-    {
-        if (strncmp(argv[i], "http", 4) == 0)
-        {
-            if(getGridFSURL() == NULL )
-            {
-                setGridFSURL(argv[i]);
-            }
-        }
-    }
 #endif
+
 
     if( fuse_opt_parse(&args, &helper_opts, fuse_helper_opts, grid_opt_proc) == -1 )
         return -1;

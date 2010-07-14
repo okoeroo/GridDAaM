@@ -25,7 +25,7 @@ char * getScratchDir (void)
 }
 
 
-void setGridFSURL (char * url)
+void setGridFSURL (const char * url)
 {
     if (url)
     {

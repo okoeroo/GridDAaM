@@ -34,8 +34,10 @@ griddaamfs_SOURCES = \
         common/common.c \
         logging/mylog.c \
         proto/cache.c \
+        proto/vlet.c \
 		proto/curl-getinmemory.c \
         fuse-driver/griddaam_mkdir.c \
+        fuse-driver/griddaam_open.c \
         fuse-driver/griddaam_create.c \
         fuse-driver/griddaam_readdir.c \
 		fuse-driver/griddaam_getattr.c \

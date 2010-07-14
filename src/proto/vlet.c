@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "common.h"
+#include "vlet.h"
 
 
 #define DEFAULT_SCRATCH_DIR "/tmp/griddaam_scratch"

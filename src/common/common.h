@@ -15,7 +15,7 @@
 #endif
 
 
-void setGridFSURL (char * url);
+void setGridFSURL (const char * url);
 char * getGridFSURL (void);
 void setScratchDir (char * path);
 char * getScratchDir (void);
