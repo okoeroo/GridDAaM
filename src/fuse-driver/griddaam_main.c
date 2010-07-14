@@ -57,8 +57,9 @@ static int grid_read(const char *path, char *buf, size_t size, off_t offset,
 
 /* const struct fuse_operations  *      op */
 static const struct fuse_operations grid_oper = {
-    .mkdir      = grid_mkdir,
     .getattr    = grid_getattr,
+    .mkdir      = grid_mkdir,
+    .create     = grid_create,
     .readdir    = grid_readdir,
     .open       = grid_open,
     .opendir    = grid_opendir,
@@ -103,7 +104,6 @@ int main(int argc, char *argv[])
 
 
 
-    /* ret = system ("uricopy.sh ~/testfile srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse/testfile foobar"); */
     ret = system ("uricopy.sh -force -mkdirs srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse/testfile file:///tmp/griddaam_scratch/foobar");
     printf ("Return value is: %d\n", ret);
 

@@ -10,6 +10,10 @@
 #ifndef COMMON_H
     #define COMMON_H
 
+#ifndef PATH_MAX
+    #define PATH_MAX 4096
+#endif
+
 
 void setGridFSURL (char * url);
 char * getGridFSURL (void);
