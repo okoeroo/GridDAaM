@@ -77,13 +77,11 @@ int main(int argc, char *argv[])
     int ret = 0;
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 
-    mkdir("/tmp/griddaam_scratch", 0755);
-    setScratchDir ("/tmp/griddaam_scratch");
+    /* Setup scratch space */
+    mkdir(DEFAULT_SCRATCH_DIR, 0755);
+    setScratchDir (DEFAULT_SCRATCH_DIR);
 
-    chdir ("/tmp/griddaam_scratch");
-
-
-
+    
 #if 0
     ret = system ("uricopy.sh -force -mkdirs srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse/testfile file:///tmp/griddaam_scratch/foobar");
     printf ("Return value is: %d\n", ret);

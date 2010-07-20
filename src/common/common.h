@@ -14,6 +14,8 @@
     #define PATH_MAX 4096
 #endif
 
+#define DEFAULT_SCRATCH_DIR "/tmp/griddaam_scratch"
+
 
 void setGridFSURL (const char * url);
 char * getGridFSURL (void);

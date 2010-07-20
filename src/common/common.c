@@ -6,7 +6,6 @@ static char * gridFSURL   = NULL;
 static char * scratch_dir = NULL;
 
 
-
 void setScratchDir (char * path)
 {
     if (path)

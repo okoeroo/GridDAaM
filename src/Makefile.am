@@ -1,4 +1,4 @@
-bin_PROGRAMS = griddaamfs
+bin_PROGRAMS = griddaamfs griddaamfsd
 
 # -ansi
 
@@ -17,7 +17,7 @@ bin_PROGRAMS = griddaamfs
 #               -Icommon \
 #               -Iproto
 
-AM_CFLAGS = \
+griddaamfs_CFLAGS = \
             -g -W -Wall \
             -Wmissing-prototypes \
             -Wredundant-decls -Wshadow \
@@ -38,6 +38,7 @@ griddaamfs_SOURCES = \
 		proto/curl-getinmemory.c \
         fuse-driver/griddaam_mkdir.c \
         fuse-driver/griddaam_open.c \
+        fuse-driver/griddaam_read.c \
         fuse-driver/griddaam_create.c \
         fuse-driver/griddaam_readdir.c \
 		fuse-driver/griddaam_getattr.c \
@@ -45,3 +46,27 @@ griddaamfs_SOURCES = \
 griddaamfs_LDFLAGS = 
 griddaamfs_LDADD = -lcurl $(FUSE_LIBS) $(JANSSON_LIBS)
 
+
+griddaamfsd_CFLAGS = \
+            -g -W -Wall \
+            -Wmissing-prototypes \
+            -Wredundant-decls -Wshadow \
+            -O3 -Wuninitialized \
+            -I../ \
+            -Ilogging \
+            -Icommon \
+            -Iproto \
+            -Inetwork
+
+griddaamfsd_SOURCES = \
+        logging/scar_log.c \
+        network/net_threader.c \
+        network/net_common.c \
+        network/net_server.c \
+        network/net_buffer.c \
+        network/unsigned_string.c \
+        proto/vlet.c \
+        miniFTS/fts_main.c
+
+griddaamfsd_LDFLAGS = 
+griddaamfsd_LDADD = 
