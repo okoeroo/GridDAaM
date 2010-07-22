@@ -60,6 +60,7 @@ griddaamfsd_CFLAGS = \
 
 griddaamfsd_SOURCES = \
         logging/scar_log.c \
+        common/common.c \
         network/net_threader.c \
         network/net_common.c \
         network/net_server.c \

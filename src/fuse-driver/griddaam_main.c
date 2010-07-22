@@ -77,19 +77,12 @@ int main(int argc, char *argv[])
     int ret = 0;
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 
-    /* Setup scratch space */
+    /* Setup scratch space and SRM endpoint space for the prototype demo */
     mkdir(DEFAULT_SCRATCH_DIR, 0755);
-    setScratchDir (DEFAULT_SCRATCH_DIR);
+    setScratchDir (DEFAULT_SCRATCH_DIR); 
+    setGridFSURL ("srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse");
 
     
-#if 0
-    ret = system ("uricopy.sh -force -mkdirs srm://tbn18.nikhef.nl:8446/dpm/nikhef.nl/home/dteam/okoeroo/fuse/testfile file:///tmp/griddaam_scratch/foobar");
-    printf ("Return value is: %d\n", ret);
-
-    return 0;
-#endif
-
-
     if( fuse_opt_parse(&args, &helper_opts, fuse_helper_opts, grid_opt_proc) == -1 )
         return -1;
 

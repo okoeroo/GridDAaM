@@ -3,6 +3,8 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
+#include <errno.h>
+#include <curl/curl.h>
 
 #include "main_types.h"
 
@@ -16,6 +18,8 @@
 
 #define DEFAULT_SCRATCH_DIR "/tmp/griddaam_scratch"
 
+
+char * create_tmp_local_uri (void);
 
 void setGridFSURL (const char * url);
 char * getGridFSURL (void);

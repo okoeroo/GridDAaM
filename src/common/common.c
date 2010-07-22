@@ -1,9 +1,37 @@
 #include "common.h"
-#include <curl/curl.h>
 
 
 static char * gridFSURL   = NULL;
 static char * scratch_dir = NULL;
+
+
+char * create_tmp_local_uri (void)
+{
+    char * localuri = NULL;
+    char * tmpfilename = NULL;
+
+    /* Construct mkstemp() input */
+    tmpfilename = malloc(sizeof(char) * PATH_MAX);
+    if (!tmpfilename)
+        return -EIO;
+
+    strcpy (tmpfilename, getScratchDir());
+    if (tmpfilename[strlen(tmpfilename) - 1] != '/')
+        strcat (tmpfilename, "/");
+    strcat (tmpfilename, "griddaam.XXXXXXXX");
+
+    /* Using mkstemp */
+    tmpfilename = mkstemp(tmpfilename);
+
+
+    /* Construct Local URI */
+    localuri = malloc (sizeof(char) * PATH_MAX);
+    strcpy (localuri, "file://");
+    strcat (localuri, tmpfilename);
+
+
+    return tmpfilename;
+}
 
 
 void setScratchDir (char * path)
